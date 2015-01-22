@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <title>Build Dashboard</title>
+</head>
+<body>
+    <table>
+        <thead><th>Name</th><th>Job Status</th></thead>
+        <tbody>
+    {% for job in results %}
+        <tr>
+            <td> <a href={{job.url}} >{{job.name}}</a> </td>
+             <td bgcolor={{job.color}} ></td>
+        </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

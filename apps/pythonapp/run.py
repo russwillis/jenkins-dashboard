@@ -1,27 +1,28 @@
 from flask import Flask
-import jenkins
-import sys
+import requests
+from flask import render_template
+from operator import itemgetter
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def get_jenkins_stuff():
     try:
-        # Jenkins(url, username, password)
-        j = jenkins.Jenkins('https://builds.apache.org/')
+        # general apache url with lots of colors and jobs
+        # url = "https://builds.apache.org/api/json?pretty=true"
+        # LR builds
+        url = "http://54.148.201.225:8080/api/json?pretty=true"
+        response = requests.get(url)
+        stuff = response.json()['jobs']
+        # sort the array by the color tag (alphabetically)
+        sorted_stuff = sorted(stuff, key=itemgetter('color'), reverse=True)
 
-        info = j.get_info()
-        jobs = info['jobs']
-    except jenkins.JenkinsException, e:
-        #it went wrong so send back some information for debug
-        return '<p>Error reported from request:</p><p> %s</p>' % (e)
+    except Exception, e:
+        # it went wrong so send back some information for debug
+        return render_template("error.html", error=e)
 
-    #Everything worked so return an OK message
-    #return '<p>OK</p><p> %s </p>' % (jobs[0])
-
-    #lets do a litle debug print out to see what we've got
-    return '<p> %s </p>' % (info)
-
+    return render_template("index.html", results=sorted_stuff)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
